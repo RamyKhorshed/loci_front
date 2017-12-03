@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Searchbar from './Searchbar';
 import ResultList from './ResultList';
 import Wikitext from './Wikitext';
+
 import { Divider } from 'semantic-ui-react'
 
 
@@ -17,7 +18,9 @@ class Container extends Component {
       },
       results: [
                 '', [], [], []
-            ]
+            ],
+      snippetInfo: [
+        []]
     }
   }
 
@@ -39,9 +42,22 @@ class Container extends Component {
     )
   }
 
+  handleHighlight = (title) => {
+    var text = window.getSelection().toString()
+
+    var snippetInfo = this.state.snippetInfo.slice()
+    snippetInfo.push([title,text])
+
+    if (text.length > 3){
+      this.setState({
+        ...this.state,
+        snippetInfo
+      });
+    }
+  }
 
   handleArticleSearch = searchTerm => {
-    let URL = "http://en.wikipedia.org/w/api.php?action=parse&section=0&format=json&origin=*&prop=text&page=" + searchTerm + "&callback=?"
+    let URL = "http://en.wikipedia.org/w/api.php?action=parse&format=json&origin=*&prop=text&page=" + searchTerm + "&callback=?"
     let output = ""
 
     fetch(URL)
@@ -80,8 +96,6 @@ class Container extends Component {
     });
   }
 
-
-
   updateWiki = () => {
     this.handleSearch(this.state.topic)
   }
@@ -96,11 +110,15 @@ class Container extends Component {
           handleSearchChange={this.handleSearchChange}
           handleTopicSubmit={this.handleTopicSubmit}/>
           <Divider section />
-        {this.state.wikiDisplayed ?
-          <Wikitext topic={this.state.topic} articleHTML={this.state.articleHTML}/>
-            :
-          <ResultList results={this.state.results} handleArticleSearch={this.handleArticleSearch}/>
-        }
+
+          <div id="clickable">
+            {this.state.wikiDisplayed ?
+              <Wikitext topic={this.state.topic}
+                articleHTML={this.state.articleHTML} snippetInfo={this.state.snippetInfo} handleHighlight={this.handleHighlight}/>
+              :
+              <ResultList results={this.state.results} handleArticleSearch={this.handleArticleSearch}/>
+            }
+          </div>
       </div>
     );
   }

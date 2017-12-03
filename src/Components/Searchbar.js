@@ -12,6 +12,8 @@ const Searchbar = props => {
              />
             <button type="submit" className="ui button"> Search </button>
           </form>
+
+
         </div>
       )
 }

@@ -1,0 +1,19 @@
+<script>
+    function getSelectionText() {
+        var text = "";
+        if (window.getSelection) {
+            text = window.getSelection().toString();
+        } else if (document.selection && document.selection.type != "Control") {
+            text = document.selection.createRange().text;
+        }
+        return text;
+    }
+    $('#clickable').ready(function (){
+       $('#clickable').mouseup(function (e){
+           var text = getSelectionText()
+           if (text.length > 3){
+             alert(text)
+           }
+       })
+    });
+</script>
