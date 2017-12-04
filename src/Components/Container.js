@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Searchbar from './Searchbar';
 import ResultList from './ResultList';
 import Wikitext from './Wikitext';
-
 import { Divider } from 'semantic-ui-react'
 
 
@@ -19,16 +18,33 @@ class Container extends Component {
       results: [
                 '', [], [], []
             ],
-      snippetInfo: [
-        []]
+      snippetInfo:[]
     }
   }
 
+  componentDidMount = () => {
+    let user_id = 1
+    let URL = "http://localhost:3000/api/v1/users/"+{user_id}
+
+    fetch(URL).then((resp)=> {
+      return resp.json()
+    })
+    .then((data) => {
+      let   fetchArray = []
+      data.snippets.forEach((snippet) => fetchArray.push([snippet.title, snippet.content]))
+      var snippetInfo = this.state.snippetInfo.slice()
+      snippetInfo=fetchArray;
+      debugger;
+      this.setState({
+         ...this.state,
+         snippetInfo
+       });
+      }
+    )
+  }
 
   handleSearch = searchTerm => {
-
     let URL = "https://en.wikipedia.org/w/api.php?&origin=*&action=opensearch&search=" + searchTerm + "&limit=5"
-
     fetch(URL).then((resp)=> {
       return resp.json()
     })
@@ -46,14 +62,37 @@ class Container extends Component {
     var text = window.getSelection().toString()
 
     var snippetInfo = this.state.snippetInfo.slice()
-    snippetInfo.push([title,text])
+    var newSnippet = [title,text]
+    snippetInfo.push(newSnippet)
 
     if (text.length > 3){
       this.setState({
         ...this.state,
         snippetInfo
       });
+
+    this.postToDatabase(newSnippet);
     }
+  }
+
+  postToDatabase =(newSnippet)=>{
+    user_id = 1
+    let user_id = 1
+    let URL = "http://localhost:3000/api/v1/snippets/"
+    fetch(URL, {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        {
+          title: newSnippet[0],
+          content: newSnippet[1],
+          user_id: user_id
+        }
+      )
+    })
   }
 
   handleArticleSearch = searchTerm => {

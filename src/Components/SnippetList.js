@@ -6,6 +6,7 @@ class SnippetList extends React.Component {
 
   render() {
     var snippets = this.props.snippetInfo.map((result, index) => {
+        console.log(result)
         return (
           <Card
             header={result[0]}
