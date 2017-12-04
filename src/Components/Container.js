@@ -34,7 +34,7 @@ class Container extends Component {
       data.snippets.forEach((snippet) => fetchArray.push([snippet.title, snippet.content]))
       var snippetInfo = this.state.snippetInfo.slice()
       snippetInfo=fetchArray;
-      debugger;
+
       this.setState({
          ...this.state,
          snippetInfo
@@ -76,7 +76,6 @@ class Container extends Component {
   }
 
   postToDatabase =(newSnippet)=>{
-    user_id = 1
     let user_id = 1
     let URL = "http://localhost:3000/api/v1/snippets/"
     fetch(URL, {
