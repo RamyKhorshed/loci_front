@@ -1,5 +1,5 @@
 import React from 'react';
-import { Segment, Container, Header, Rail, Sticky } from 'semantic-ui-react'
+import { Segment, Container, Header } from 'semantic-ui-react'
 import SnippetList from './SnippetList';
 
 

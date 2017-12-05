@@ -3,6 +3,7 @@ import Searchbar from './Searchbar';
 import ResultList from './ResultList';
 import Wikitext from './Wikitext';
 import { Divider } from 'semantic-ui-react'
+import { api } from '../Services/api';
 
 
 class Container extends Component {
@@ -17,31 +18,22 @@ class Container extends Component {
       },
       results: [
                 '', [], [], []
-            ],
-      snippetInfo:[]
+            ]
     }
   }
 
-  componentDidMount = () => {
-    let user_id = 1
-    let URL = "http://localhost:3000/api/v1/users/"+{user_id}
-
-    fetch(URL).then((resp)=> {
-      return resp.json()
-    })
-    .then((data) => {
-      let   fetchArray = []
-      data.snippets.forEach((snippet) => fetchArray.push([snippet.title, snippet.content]))
-      var snippetInfo = this.state.snippetInfo.slice()
-      snippetInfo=fetchArray;
-
-      this.setState({
-         ...this.state,
-         snippetInfo
-       });
-      }
-    )
+  componentWillMount() {
+    if (!localStorage.getItem('token')) {
+      this.props.history.push('/login');
+    } else {
+      api.auth.getCurrentUser().then(user => {
+        if (user.error) {
+          this.props.history.push('/login');
+        }
+      });
+    }
   }
+
 
   handleSearch = searchTerm => {
     let URL = "https://en.wikipedia.org/w/api.php?&origin=*&action=opensearch&search=" + searchTerm + "&limit=5"
@@ -61,22 +53,19 @@ class Container extends Component {
   handleHighlight = (title) => {
     var text = window.getSelection().toString()
 
-    var snippetInfo = this.state.snippetInfo.slice()
+    var snippetInfo = this.props.snippetInfo.slice()
     var newSnippet = [title,text]
     snippetInfo.push(newSnippet)
 
     if (text.length > 3){
-      this.setState({
-        ...this.state,
-        snippetInfo
-      });
-
-    this.postToDatabase(newSnippet);
+      this.props.snippetUpdate(snippetInfo)
+      this.postToDatabase(newSnippet);
     }
   }
 
   postToDatabase =(newSnippet)=>{
-    let user_id = 1
+    let user_id = this.props.user.id
+    console.log(user_id)
     let URL = "http://localhost:3000/api/v1/snippets/"
     fetch(URL, {
       method: 'post',
@@ -152,7 +141,7 @@ class Container extends Component {
           <div id="clickable">
             {this.state.wikiDisplayed ?
               <Wikitext topic={this.state.topic}
-                articleHTML={this.state.articleHTML} snippetInfo={this.state.snippetInfo} handleHighlight={this.handleHighlight}/>
+                articleHTML={this.state.articleHTML} snippetInfo={this.props.snippetInfo} handleHighlight={this.handleHighlight}/>
               :
               <ResultList results={this.state.results} handleArticleSearch={this.handleArticleSearch}/>
             }

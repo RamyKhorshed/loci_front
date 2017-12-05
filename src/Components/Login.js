@@ -1,5 +1,6 @@
 import React from 'react';
 import { api } from '../Services/api';
+import { Link, withRouter } from 'react-router-dom';
 
 class Login extends React.Component {
   constructor() {
@@ -22,7 +23,6 @@ class Login extends React.Component {
     e.preventDefault();
     api.auth.login(this.state.fields).then(res => {
       if (!res.error) {
-        const updatedState = { ...this.state.auth, user: res };
         this.props.handleLogin(res);
         this.props.history.push('/');
       } else {
@@ -36,6 +36,7 @@ class Login extends React.Component {
     return (
       <div>
         {this.state.error ? <h1>Try again...</h1> : null}
+
         <div className="ui form">
           <form onSubmit={this.handleSubmit}>
             <div className="ui field">
@@ -60,6 +61,9 @@ class Login extends React.Component {
             <button type="submit" className="ui basic green button">
               Login
             </button>
+            <Link to="/user/new">
+                <div className="ui basic blue button">Create New User</div>
+            </Link>
           </form>
         </div>
       </div>

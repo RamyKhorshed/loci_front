@@ -9,6 +9,7 @@ class SnippetList extends React.Component {
         console.log(result)
         return (
           <Card
+            key={index}
             header={result[0]}
             description={result[1]}
             centered= {true}
