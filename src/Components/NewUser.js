@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Button } from 'semantic-ui-react'
+import { Input, Grid } from 'semantic-ui-react'
 
 
 class NewUser extends Component {
@@ -54,7 +54,13 @@ class NewUser extends Component {
 
   render() {
     return (
-      <div className="ui compact segment">
+      <Grid
+      textAlign='center'
+      style={{ height: '100%' }}
+      verticalAlign='middle'
+    >
+      <Grid.Column style={{ maxWidth: 450 }}>
+      <div className="ui segment">
       <form className="ui form" onSubmit={this.handleSubmit}>
         <div className="field">
           <label>Username</label>
@@ -86,6 +92,8 @@ class NewUser extends Component {
         </button>
       </form>
     </div>
+  </Grid.Column>
+  </Grid>
     );
   }
 }

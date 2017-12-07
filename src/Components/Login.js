@@ -1,6 +1,7 @@
 import React from 'react';
 import { api } from '../Services/api';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import {Segment,  Grid, Label, Header} from 'semantic-ui-react'
 
 class Login extends React.Component {
   constructor() {
@@ -12,6 +13,21 @@ class Login extends React.Component {
         password: ''
       }
     };
+  }
+  componentWillMount() {
+    if (!localStorage.getItem('token')) {
+      this.props.history.push('/login');
+    } else {
+      api.auth.getCurrentUser().then(user => {
+        if (user.error) {
+          this.props.history.push('/login');
+        }
+        else {
+          this.props.history.push('/');
+        }
+
+      });
+    }
   }
 
   handleChange = e => {
@@ -34,8 +50,18 @@ class Login extends React.Component {
   render() {
     const { fields } = this.state;
     return (
-      <div>
-        {this.state.error ? <h1>Try again...</h1> : null}
+      <Grid
+      textAlign='center'
+      style={{ height: '100%' }}
+      verticalAlign='middle'
+    >
+      <Grid.Column style={{ maxWidth: 450 }}>
+
+        <Segment very padded basic>
+          <Header as="h1" color="blue"> Welcome to Loci</Header>
+        </Segment>
+
+        {this.state.error ? <Segment very padded basic><Label basic padded color='red' >Incorrect Username/Password Combination</Label> </Segment>: null}
 
         <div className="ui form">
           <form onSubmit={this.handleSubmit}>
@@ -66,7 +92,8 @@ class Login extends React.Component {
             </Link>
           </form>
         </div>
-      </div>
+      </Grid.Column>
+      </Grid>
     );
   }
 }

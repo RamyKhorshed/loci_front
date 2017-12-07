@@ -53,19 +53,17 @@ class Container extends Component {
   handleHighlight = (title) => {
     var text = window.getSelection().toString()
 
-    var snippetInfo = this.props.snippetInfo.slice()
+    var snippetInfo = this.props.currentSnippet.slice()
     var newSnippet = [title,text]
     snippetInfo.push(newSnippet)
 
     if (text.length > 3){
-      this.props.snippetUpdate(snippetInfo)
-      this.postToDatabase(newSnippet);
+      this.props.currentSnippetUpdate(snippetInfo)
     }
   }
 
-  postToDatabase =(newSnippet)=>{
+  postToDatabase =(newSnippet, index)=>{
     let user_id = this.props.user.id
-    console.log(user_id)
     let URL = "http://localhost:3000/api/v1/snippets/"
     fetch(URL, {
       method: 'post',
@@ -80,7 +78,7 @@ class Container extends Component {
           user_id: user_id
         }
       )
-    })
+    }).then(this.props.removeCurrentSnippet(index)).then(this.props.snippetUpdate(newSnippet))
   }
 
   handleArticleSearch = searchTerm => {
@@ -136,16 +134,25 @@ class Container extends Component {
           topic={this.state.topic}
           handleSearchChange={this.handleSearchChange}
           handleTopicSubmit={this.handleTopicSubmit}/>
-          <Divider section />
+        <Divider section />
 
-          <div id="clickable">
-            {this.state.wikiDisplayed ?
-              <Wikitext topic={this.state.topic}
-                articleHTML={this.state.articleHTML} snippetInfo={this.props.snippetInfo} handleHighlight={this.handleHighlight}/>
-              :
-              <ResultList results={this.state.results} handleArticleSearch={this.handleArticleSearch}/>
-            }
-          </div>
+        <div id="clickable">
+          {this.state.wikiDisplayed ?
+            <Wikitext
+              topic={this.state.topic}
+              articleHTML={this.state.articleHTML}
+
+              handleHighlight={this.handleHighlight}
+              postToDatabase={this.postToDatabase}
+
+              currentSnippet={this.props.currentSnippet}
+              removeCurrentSnippet={this.props.removeCurrentSnippet}/>
+            :
+            <ResultList
+              results={this.state.results}
+              handleArticleSearch={this.handleArticleSearch}/>
+          }
+        </div>
       </div>
     );
   }

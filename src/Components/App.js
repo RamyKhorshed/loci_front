@@ -4,7 +4,7 @@ import Container from './Container';
 import Login from './Login';
 import Navbar from './Navbar';
 import NewUser from './NewUser';
-import SnippetList from './SnippetList';
+import FullSnippetList from './FullSnippetList';
 import './App.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Route} from 'react-router-dom';
@@ -21,6 +21,7 @@ class App extends Component {
         user: {}
       },
       snippetInfo:[],
+      currentSnippet:[],
       userInfo:[]
     };
   }
@@ -33,19 +34,65 @@ class App extends Component {
       console.log('there is a token');
       api.auth.getCurrentUser().then(user => {
         const updatedState = { ...this.state.auth, user: user };
-        console.log(updatedState)
         this.setState({ auth: updatedState });
-      }).then(this.getSnippet).then(this.getUsers)
+      }).then(this.getSnippet).then(this.getUsers())
       ;
     }
   }
 
-  // Set State for Snippet Information
-  snippetUpdate = (snippetInfo) => {
+  currentSnippetUpdate = (currentSnippet) => {
     this.setState({
       ...this.state,
-      snippetInfo
+      currentSnippet
     });
+  }
+
+  removeCurrentSnippet = (index) => {
+    let newArray = []
+    newArray = this.state.currentSnippet
+    delete newArray[index]
+    this.currentSnippetUpdate(newArray)
+  }
+
+  removeSnippet = (index) => {
+    let newArray = []
+    newArray = this.state.snippetInfo
+    delete newArray[index]
+    this.setState({
+      ...this.state,
+      snippetInfo:newArray
+    });
+    this.updateDatabase(index)
+  }
+
+  // Set State for Snippet Information
+  snippetUpdate = (snippetInfo) => {
+    let array = []
+    array = this.state.snippetInfo
+    array.push(snippetInfo)
+    this.setState({
+      ...this.state,
+      snippetInfo:array
+    });
+  }
+
+  updateDatabase = (index) =>{
+    let user_id = this.state.auth.user.id
+    let URL = "http://localhost:3000/api/v1/users/"+user_id
+
+    fetch(URL, {
+      method: 'PATCH',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        {
+          user_id,
+          index
+        }
+      )
+    })
   }
 
   // Get Snippets
@@ -78,7 +125,7 @@ class App extends Component {
     }).then((data) => {
       let   fetchArray = []
       if (!!data) {
-        data.forEach((user) => fetchArray.push([user.username, user.first_name, user.last_name]))
+        data.forEach((user) => fetchArray.push([user.username, user.id]))
         var userInfo = this.state.userInfo.slice()
         userInfo=fetchArray;
         this.setState({
@@ -93,6 +140,7 @@ class App extends Component {
   login = data => {
     const updatedState = { ...this.state.auth, user: data };
     localStorage.setItem('token', data.jwt);
+
     this.setState({ auth: updatedState });
     this.getSnippet()
   };
@@ -103,6 +151,7 @@ class App extends Component {
   };
 
   render() {
+    console.log(this.state.userInfo)
     return (
       <Router>
       <div className="App">
@@ -111,7 +160,6 @@ class App extends Component {
           userInfo={this.state.userInfo}
           handleLogout={this.logout} />
         <header className="App-header">
-          <h1 className="header">Welcome to Loci</h1>
           <a href="/"><img src={logo} className="App-logo" alt="logo" /></a>
         </header>
         <Route
@@ -125,11 +173,20 @@ class App extends Component {
         <Route
           exact
           path="/"
-          render={props => <Container {...props}  snippetUpdate={this.snippetUpdate} user={this.state.auth.user} snippetInfo={this.state.snippetInfo} />}
+          render={props => <Container {...props}
+            snippetUpdate={this.snippetUpdate}
+            user={this.state.auth.user}
+            currentSnippet={this.state.currentSnippet}
+            currentSnippetUpdate={this.currentSnippetUpdate}
+            removeCurrentSnippet={this.removeCurrentSnippet}
+          />}
         />
         <Route
           path="/Snippets"
-          render={props =><SnippetList {...props}  snippetInfo={this.state.snippetInfo}/>}
+          render={props =><FullSnippetList {...props}
+            snippetInfo={this.state.snippetInfo}
+            removeSnippet={this.removeSnippet}
+          />}
         />
       </div>
     </Router>

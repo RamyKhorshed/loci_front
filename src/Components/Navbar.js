@@ -5,17 +5,13 @@ import {Button, Search} from 'semantic-ui-react'
 const Navbar = props => {
   const currentUser = props.currentUser;
   const loggedIn = !!props.currentUser.id;
-  console.log(props.userInfo)
   return (
     <div className={`ui top fixed inverted ${props.color} menu`}>
-      <Link to="/" className="item">
         {loggedIn ? (
-          <a className="item">Welcome {currentUser.username}</a>
+          <Link to="/" className="item">
+            <a className="item">Welcome {currentUser.username}</a>
+          </Link>
         ) : null}
-      </Link>
-      <div className="left menu item">
-        <Search placeholder="Search for users" results={props.userInfo}/>
-      </div>
       <div className="right menu">
 
         {loggedIn ? (

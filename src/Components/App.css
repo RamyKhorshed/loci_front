@@ -3,9 +3,9 @@
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
+  animation: App-logo-spin infinite 50s linear;
   height: 80px;
-  margin: 10px;
+  margin: 75px;
 }
 
 .App-nav-logo {
@@ -16,7 +16,7 @@
 .App-header {
   background-color: #222;
   height: 180px;
-  padding: 20px;
+  padding: 10px;
   color: white;
 }
 
@@ -29,6 +29,22 @@
   font-size: large;
   color: white;
 }
+
+.sideContainer {
+    float:left;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 20px;
+}
+.imageContainer {
+  float:left;
+  width: 100%;
+  min-height: 200px;
+  max-height: 800px;
+}
+
+
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
